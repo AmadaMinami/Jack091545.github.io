@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="keywords" content="手札">
+  <meta name="author" content="9th Patient">
+  <meta name="description" content="ダメ人間物語">
+  
+  
+  <title>
+    
+      Andorid模拟器桥接网络通信 
+      
+      
+      |
+    
+     9th Patient
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/orange.png">
+    <link rel="icon" href="/images/orange.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+
+  <!-- jquery3.3.1 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- fancybox -->
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <script async src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js"></script>
+
+  <!-- busuanzi -->
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  <script src="/js/fancybox.js"></script>
+
+  
+
+<link rel="stylesheet" href="/css/prism.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/14040726.jpeg" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">9th Patient</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Root</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          <a href="/friends/">Friends</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+<script src="/js/activeNav.js"></script>
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+<!-- LaTex Display -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">Andorid模拟器桥接网络通信</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime" title="Update time"></i>
+          2020-01-09 23:03:01
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags" title="Tags"></i>
+                
+                <span class="span--tag">
+                  <a href="/tags/Android/" title="Android">
+                    <b>#</b> Android
+                  </a>
+                </span>
+                
+                <span class="span--tag">
+                  <a href="/tags/Emulator/" title="Emulator">
+                    <b>#</b> Emulator
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <p>最近研究的项目，是以一个需要Andorid模拟器与宿主机通信的案例。其中通过查阅<a href="https://developer.android.google.cn/studio/run/emulator-networking?hl=zh-cn" target="_blank" rel="noopener">google官方文档</a>发现了两种进行网络通信的方式。正常情况下，andorid模拟器有自带一个网关，产生了一个局域网。andorid躲在这个网关背后。所以无法正常获取到与宿主机相同的网段ip，也就无法正常与宿主机。google提供的方法有两种方法：</p>
+<ul>
+<li><p>通过模拟器控制台设置重定向，即将andorid的网络端口按照<code>tcp/udp:andorid</code>机端口:宿主机端口进行重定向。各自使用对应的localhost端口进行通信。</p>
+</li>
+<li><p>通过adb进行网络端口转发，使用<code>adb forward tcp:6100 tcp:7100</code>进行端口转发，和模拟器控制台进行重定向差不多，但是……</p>
+<blockquote>
+<p>“除了通过终止adb服务器来移除重定向以外，adb目前不提供任何移除重定向的方法。”</p>
+</blockquote>
+</li>
+</ul>
+<p>google官方文档这样写着。</p>
+<p>其实这两种有种很大的弊端，google官方从应用设计的角度去考虑了，但不能满足应用开发者所要用到所有要求。即，当应用需要使用10+以上数量端口的时候，使用端口映射或许会使使用者变得焦虑无比，从而放弃。但庆幸，qemu的设计者并没有这么愚顿。emulator存在一个<code>-nap-tap</code>选项，用于满足使用tap的情形。也就是说，这将成为第三种给Andorid系统接入网络的方式。</p>
+<h2 id="进行准备工作"><a href="#进行准备工作" class="headerlink" title="进行准备工作"></a>进行准备工作</h2><hr>
+<p>使用的实验环境：</p>
+<ul>
+<li>Ubuntu18.04</li>
+<li>Android emulator version 29.3.4.0 (build_id 6110076) (CL:N/A)</li>
+<li>Android10(Q)</li>
+</ul>
+<p>查看系统支持：<br>qemu 支持多种网络链接方式，其中最常用的就是桥接(bridge)。 这需要依赖内核的 tun/tap 模块的支持，输入如下命令查看<code>/dev/net/tun</code>文件。</p>
+<pre><code class="bash">ls -l /dev/net/tun 
+crw-rw-rwT 1 root root 10, 200 Apr 15 02:23 /dev/net/tun
+</code></pre>
+<p>如果存在，说明内核已经支持</p>
+<p>安装必须的工具：</p>
+<pre><code class="bash"># 虚拟网桥工具
+sudo apt-get install uml-utilities
+# UML（User-mode linux）工具
+sudo apt-get install bridge-utils
+</code></pre>
+<h2 id="创建网桥"><a href="#创建网桥" class="headerlink" title="创建网桥"></a>创建网桥</h2><hr>
+<p>针对创建网桥的方式，根据如图所示</p>
+<p><img src="https://s2.ax1x.com/2020/01/09/lfN5dJ.png" class="img-shadow"></p>
+<p>eth0为所使用的物理网卡,tap0为使用的虚拟网卡，br0为搭建在eth0上的网桥。需要注意的是，eth0在你的PC上可能为其他的名字，比如ens9等等。还有一点，创建网桥必须在有线网卡之上，否则不能将接口添加到br0中。（经过我的测试，无线网卡不支持，如果有办法添加，再更新此篇）。</p>
+<p>下面以一个脚本up.sh来说明创建过程</p>
+<pre><code class="bash">#!/bin/bash
+
+sudo ifconfig ens9 down # 除能有线网卡
+sudo brctl addbr br0    # 添加网桥
+sudo brctl addif br0 ens9 # 添加有线网卡到网桥
+sudo brctl stp br0 off # 不需要STP(生成树协议)
+sudo brctl setfd br0 1 # 设置网桥转发延迟
+sudo brctl sethello br0 1 # 设置网桥hello时间
+sudo ifconfig br0 0.0.0.0 promisc up  # 混杂模式启动网桥
+sudo ifconfig ens9 0.0.0.0 promisc up # 混杂模式启动有线网卡
+sudo dhclient br0 # 自动获取网桥ip
+sudo ifconfig br0 192.168.31.22 netmask 255.255.255.0 # 配置网桥的ip地址和掩码
+sudo route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.168.31.1 # 添加网关信息
+# 这里的ip地址和gateway，需要根据实际情况进行设置
+
+# 创建tap
+sudo tunctl -t tap0 -u user # 为用户user添加tap0，此处的user，填写自己的linux账户名
+sudo brctl addif br0 tap0 # 添加tap0到网桥
+sudo ifconfig tap0 0.0.0.0 promisc up # 混杂模式启动tap0
+sudo brctl showstp br0 # 打印一下网桥的信息
+</code></pre>
+<p>下面以一个脚本down.sh来说明反创建过程</p>
+<pre><code class="bash">#!/bin/bash 
+
+# adb会占用/dev/net/tun，导致后面的步骤失效，先杀掉
+kill -9 $(pidof adb) 
+sudo ifconfig tap0 down 
+sudo tunctl -d tap0 # 删除tap0
+sudo ifconfig ens9 down
+sudo ifconfig br0 down
+sudo brctl delbr br0 # 删除网桥
+sudo ifconfig ens9 up
+
+</code></pre>
+<h2 id="启动模拟器"><a href="#启动模拟器" class="headerlink" title="启动模拟器"></a>启动模拟器</h2><hr>
+<p>仍然以脚本start_emulator来说明</p>
+<pre><code class="bash">#!/bin/bash
+
+# 设置环境
+export LD_LIBRARY_PATH=/home/user/Android/Sdk/emulator/lib64/qt/lib:/home/user/Android/Sdk/emulator/lib64
+
+
+/home/user/Android/Sdk/emulator/qemu/linux-x86_64/qemu-system-x86_64 \
+    -netdelay none \
+    -netspeed full \
+    -avd Lark_API_29 \
+    -net-tap tap0 
+</code></pre>
+<p>其中<code>-net-tap0</code>即为使用刚刚创建好的tap0，这样进入android系统的时候，使用<code>adb shell</code>打开shell后，<code>ifconfig -a</code>，查看ip地址的时候，就可以发现，已经和宿主机是相同的ip地址了。互相ping一下，也能ping通。说明，andorid模拟器已经成为与宿主机同级网络下的一个终端机了。</p>
+<p>上述环境所使用的android镜像是通过android studio下载安装的andorid镜像。</p>
+<h2 id="但是"><a href="#但是" class="headerlink" title="但是"></a>但是</h2><hr>
+<p>很不幸运，上面所说的，在自己下载android源码并编译的系统镜像下，并不完全适用。需要修改的是以下几点。</p>
+<ul>
+<li>默认关闭wifi网卡</li>
+<li>使用刚刚创建好的脚本自动执行虚拟网卡的创建与删除</li>
+<li>打通内外ip</li>
+</ul>
+<p>首先，默认关闭wifi网卡。在模拟器启动参数中添加：</p>
+<pre><code class="bash">-feature -Wifi
+</code></pre>
+<p>这样android模拟器才会使用所指定的tap0，否则获取到的ip为192.168.200.2这样一个奇怪的ip。是一个二级网络中的ip。</p>
+<p>使用创建好的up.sh和down.sh，在模拟器启动参数中添加：</p>
+<pre><code class="bash">    -net-tap-script-up $scriptsdir/up.sh \
+    -net-tap-script-down $scriptsdir/down.sh
+</code></pre>
+<p>此处的<code>$scriptsdir</code>为这两个脚本存在的目录。</p>
+<p>这样启动模拟器后，可能还是会存在一个问题，就是无法与外界ping通，但是ip是正确被设置了。</p>
+<pre><code>tcpdump -i eth0 # eth0为andorid系统内的网卡
+</code></pre><p>这样看应该能够看到一些在滚动的数据，这个时候只需要在adb shell中执行</p>
+<pre><code>ip rule add from all lookup main pref 0
+</code></pre><p>这样即可达到互相ping一下，也能ping通的效果了，也就完成了Andorid模拟器与宿主机通信的问题了。</p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2019/02/19/如何解码PCM/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime" title="Update time"></i>
+              2020-01-09 23:03:01
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags" title="Tags"></i>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/Android/" title="Android">
+                        <b>#</b> Android
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/Emulator/" title="Emulator">
+                        <b>#</b> Emulator
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2021/02/22/Year-2021/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div class="post-catalog" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#进行准备工作"><span class="toc-text">进行准备工作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#创建网桥"><span class="toc-text">创建网桥</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#启动模拟器"><span class="toc-text">启动模拟器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#但是"><span class="toc-text">但是</span></a></li></ol>
+    </div>
+  </div>
+
+  <script src="/js/catalog.js"></script>
+
+
+
+    
+      <div class="comments-container">
+        
+  <div id="disqus_thread"></div>
+  <script>
+
+  /**
+  *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+  *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+  /*
+  var disqus_config = function () {
+  this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+  this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+  };
+  */
+  (function() { // DON'T EDIT BELOW THIS LINE
+  var d = document, s = d.createElement('script');
+  s.src = 'https://www-j2kly-com.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+  })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        <div class="footer">
+  <div class="social">
+    <ul>
+      
+        
+      
+        
+        <li>
+          <a title="email" href="mailto:amada.minami@protonmail.com">
+            <i class="iconfont icon-envelope"></i>
+          </a>
+        </li>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+        <li>
+          <a title="rss" href="/atom.xml">
+            <i class="iconfont icon-rss"></i>
+          </a>
+        </li>
+        
+      
+    </ul>
+  </div>
+  
+    <div class="footer-more">
+      
+        <a href="https://9th.link">Copyright © 9th Patient 2021</a>
+        
+    </div>
+  
+    <div class="footer-more">
+      
+        <a href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+</div>
+
+      </div>
+
+      <div class="back-to-top hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+<script src="/js/backtotop.js"></script>
+
+
+      
+  <div class="search-icon" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+    </div>
+  </body>
+</html>
